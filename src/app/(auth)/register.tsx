@@ -54,7 +54,7 @@ const Register = () => {
 
   return (
     <Screen>
-      {/* <AppHeader /> */}
+      {router.canGoBack() && <AppHeader />}
 
       <View style={{ marginTop: 20 }}>
         <StyledText

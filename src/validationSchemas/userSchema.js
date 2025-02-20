@@ -5,7 +5,7 @@ export const userLoginSchema = Yup.object().shape({
   password: Yup.string().required("Password is required"),
 });
 
-export const userRegisterSchema = Yup.object().shape({
+export const userRegisterSchema1 = Yup.object().shape({
   firstname: Yup.string()
     .matches(/^[A-Za-z]+$/, "First name must contain only letters")
     .min(2, "First name must be at least 2 characters")
@@ -18,7 +18,9 @@ export const userRegisterSchema = Yup.object().shape({
     .required("Last name is required"),
   phoneNumber: Yup.string().required("Phone number is required"),
   email: Yup.string().email("Email is not valid").required("Email is required"),
+});
 
+export const userRegisterSchema2 = Yup.object().shape({
   password: Yup.string()
     .required("Password is required")
     .min(6, "Password must be at least 6 characters")

@@ -1,6 +1,7 @@
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { useState, useEffect } from "react";
 import { Link } from "expo-router";
+import _ from "lodash";
 
 import { Colors } from "@/src/constants/Colors";
 import StyledText from "@/src/components/StyledText";
@@ -33,7 +34,7 @@ const Products = () => {
     } else {
       let numberOfProducts = 0;
       products?.forEach((product) => {
-        if (product.portfolioTypeName === filter) {
+        if (product?.portfolioTypeName === filter) {
           numberOfProducts++;
         }
       });
@@ -57,12 +58,22 @@ const Products = () => {
 
     fetchData();
   };
-  const productImages = {
-    0: require("@/assets/images/products/0.png"),
-    1: require("@/assets/images/products/1.png"),
-    2: require("@/assets/images/products/2.png"),
-    3: require("@/assets/images/products/3.png"),
-    4: require("@/assets/images/products/4.png"),
+
+  const getProductImage = (productName) => {
+    const products = [
+      "pathway_money_market_note",
+      "pathway_fixed_income_note",
+      "pathway_fixed_deposit_note",
+      "pathway_dollar_note",
+      "pathway_hybrid_note",
+    ];
+    if (products.includes(_.snakeCase(productName))) {
+      return `https://res.cloudinary.com/dtu6cxvk6/image/upload/${_.snakeCase(
+        productName
+      )}.png`;
+    } else {
+      return `https://res.cloudinary.com/dtu6cxvk6/image/upload/default.png`;
+    }
   };
 
   return (
@@ -116,18 +127,14 @@ const Products = () => {
                       <Product
                         product={product}
                         key={index}
-                        img={
-                          index < 5 ? productImages[index] : productImages[0]
-                        }
+                        img={getProductImage(product?.portfolioName)}
                       />
                     ) : (
                       product.portfolioTypeName === filter && (
                         <Product
                           product={product}
                           key={index}
-                          img={
-                            index < 5 ? productImages[index] : productImages[0]
-                          }
+                          img={getProductImage(product?.portfolioName)}
                         />
                       )
                     )}

@@ -1,14 +1,11 @@
 import React from "react";
 import { StyleSheet, Text, Pressable, View, Image } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { Moneys, Calendar2 } from "iconsax-react-native";
-import axios from "axios";
+import { Moneys } from "iconsax-react-native";
 import { router } from "expo-router";
 
 import { Colors } from "@/src/constants/Colors";
 import StyledText from "./StyledText";
 import AppDivider from "./AppDivider";
-import { showMessage } from "react-native-flash-message";
 import { amountFormatter } from "../helperFunctions/amountFormatter";
 
 const Product = React.forwardRef(({ onPress, product, img }, ref) => {
@@ -29,7 +26,7 @@ const Product = React.forwardRef(({ onPress, product, img }, ref) => {
     >
       <View style={styles.container}>
         <Image
-          source={img}
+          src={img}
           style={styles.image}
         />
         <View style={styles.smallContainer}>
@@ -70,27 +67,6 @@ const Product = React.forwardRef(({ onPress, product, img }, ref) => {
                   </StyledText>
                 </StyledText>
               </View>
-
-              {/* <View style={[styles.flex, { gap: 5 }]}>
-                <Calendar2
-                  size={16}
-                  variant="Bold"
-                  color={Colors.primary}
-                />
-                <StyledText
-                  color={Colors.primary}
-                  type="label"
-                  variant="regular"
-                >
-                  Min{" "}
-                  <StyledText
-                    type="label"
-                    variant="semibold"
-                  >
-                    {product && product.minimumHoldingPeriod} Days
-                  </StyledText>
-                </StyledText>
-              </View> */}
             </View>
           </View>
         </View>

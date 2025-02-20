@@ -134,12 +134,14 @@ const ResetPassword = () => {
                     onChangeText={handleChange("password")}
                     autoCapitalize={false}
                     label={"Password"}
+                    secureTextEntry={true}
                   />
                   <AppTextField
                     name={"confirmPassword"}
                     onChangeText={handleChange("confirmPassword")}
                     autoCapitalize={false}
                     label={"Confirm Password"}
+                    secureTextEntry={true}
                   />
                 </>
               )}

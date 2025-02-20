@@ -26,6 +26,7 @@ const AppPicker = ({
   rightLabelColor,
   rightLabelStyle,
   clickable = true,
+  style,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -39,7 +40,12 @@ const AppPicker = ({
 
   return (
     <>
-      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+      <View
+        style={[
+          { flexDirection: "row", justifyContent: "space-between" },
+          style,
+        ]}
+      >
         <StyledText
           color={Colors.primary}
           type="label"

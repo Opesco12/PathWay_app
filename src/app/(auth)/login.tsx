@@ -9,25 +9,10 @@ import AppButton from "@/src/components/AppButton";
 import Screen from "@/src/components/Screen";
 import AppTextField from "@/src/components/AppTextField";
 import StyledText from "@/src/components/StyledText";
+import AppHeader from "@/src/components/AppHeader";
 
 import { userLoginSchema } from "../../validationSchemas/userSchema";
 import { login } from "@/src/api";
-
-// const Header = () => {
-//   return (
-//     <View
-//       style={{
-//         justifyContent: "center",
-//         paddingTop: 10,
-//       }}
-//     >
-//       <Image
-//         source={require("../../../assets/images/logo.png")}
-//         style={{ alignSelf: "center" }}
-//       />
-//     </View>
-//   );
-// };
 
 const deviceWidth = Dimensions.get("window").width;
 
@@ -37,18 +22,15 @@ const Login = () => {
 
   return (
     <Screen>
-      {/* <Header /> */}
+      {router.canGoBack() && <AppHeader />}
       <View style={{ flex: 1 }}>
         <Image
           source={require("@/assets/images/login_image.png")}
           style={{
-            height: 300,
-            // aspectRatio: 4 / 3,
+            height: 400,
             width: deviceWidth - 40,
             marginTop: 35,
             borderRadius: 12,
-            // maxHeight: "30%",
-            // resizeMode: "cover",
           }}
         />
         <StyledText
@@ -110,7 +92,11 @@ const Login = () => {
               />
               <StyledText
                 color={Colors.primary}
-                style={{ textAlign: "right", textDecorationLine: "underline" }}
+                style={{
+                  textAlign: "right",
+                  textDecorationLine: "underline",
+                  marginVertical: 10,
+                }}
                 onPress={() => {
                   router.push("/reset-password");
                 }}
@@ -123,7 +109,10 @@ const Login = () => {
                   justifyContent: "center",
                 }}
               >
-                <AppButton onPress={handleSubmit}>
+                <AppButton
+                  onPress={handleSubmit}
+                  customStyles={{ marginTop: 10 }}
+                >
                   {isSubmitting ? (
                     <ActivityIndicator size={"small"} />
                   ) : (
@@ -131,7 +120,7 @@ const Login = () => {
                   )}
                 </AppButton>
                 <StyledText
-                  style={{ textAlign: "center", marginTop: 15 }}
+                  style={{ textAlign: "center", marginVertical: 15 }}
                   type="body"
                   variant="medium"
                 >

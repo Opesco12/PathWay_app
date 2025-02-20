@@ -12,7 +12,7 @@ import {
 import { StatusBar as ExpoStatusBar } from "expo-status-bar";
 
 import { Colors } from "@/src/constants/Colors";
-import KeyboardAvoidingWrapper from "./KeyboardAvoidingWrapper";
+// import KeyboardAvoidingWrapper from "./KeyboardAvoidingWrapper";
 
 const statusBarHeight = StatusBar.currentHeight;
 
@@ -34,43 +34,54 @@ const Screen = ({
               customStyles,
             ]}
           >
-            <ScrollView
-              showsHorizontalScrollIndicator={false}
-              style={{ flex: 1 }}
-              contentContainerStyle={{ flexGrow: 1 }}
-              showsVerticalScrollIndicator={false}
-              refreshControl={
-                <RefreshControl
-                  refreshing={refreshing}
-                  onRefresh={onRefresh}
-                />
-              }
+            <KeyboardAvoidingView
+              style={{ flex: 1, backgroundColor: Colors.white }}
+              behavior={"height"}
+              keyboardVerticalOffset={0}
             >
-              <View style={{ flex: 1 }}>
-                <KeyboardAvoidingWrapper>{children}</KeyboardAvoidingWrapper>
-              </View>
-            </ScrollView>
+              <ScrollView
+                showsHorizontalScrollIndicator={false}
+                style={{ flex: 1 }}
+                contentContainerStyle={{ flexGrow: 1 }}
+                showsVerticalScrollIndicator={false}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing ? refreshing : false}
+                    onRefresh={onRefresh}
+                  />
+                }
+              >
+                <View style={{ flex: 1 }}>{children}</View>
+              </ScrollView>
+            </KeyboardAvoidingView>
           </View>
         </>
       ) : (
         <>
           <View style={[styles.container, customStyles]}>
-            <SafeAreaView style={{ flex: 1 }}>
-              <ScrollView
-                style={{ flex: 1 }}
-                contentContainerStyle={[{ flexGrow: 1 }]}
-                showsVerticalScrollIndicator={false}
-                refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                  />
-                }
-                // keyboardShouldPersistTaps="handled"
-              >
-                <KeyboardAvoidingWrapper>{children}</KeyboardAvoidingWrapper>
-              </ScrollView>
-            </SafeAreaView>
+            <KeyboardAvoidingView
+              style={{ flex: 1 }}
+              behavior={Platform.OS === "ios" ? "padding" : "height"}
+              keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+            >
+              <SafeAreaView style={{ flex: 1 }}>
+                <ScrollView
+                  style={{ flex: 1 }}
+                  contentContainerStyle={[{ flexGrow: 1 }]}
+                  showsVerticalScrollIndicator={false}
+                  refreshControl={
+                    <RefreshControl
+                      refreshing={refreshing ? refreshing : false}
+                      onRefresh={onRefresh}
+                    />
+                  }
+                  keyboardShouldPersistTaps="handled"
+                >
+                  {children}
+                </ScrollView>
+              </SafeAreaView>
+              e
+            </KeyboardAvoidingView>
           </View>
         </>
       )}

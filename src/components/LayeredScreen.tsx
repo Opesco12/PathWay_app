@@ -41,10 +41,10 @@ const LayeredScreen = ({
       {/* Header as an absolute component */}
       <View style={[styles.imageContainer, { height: HEADER_HEIGHT }]}>
         <ImageBackground
-          source={
+          src={
             headerImageUrl && headerImageUrl !== null
               ? headerImageUrl
-              : require("../../assets/images/layer.png")
+              : `https://res.cloudinary.com/dtu6cxvk6/image/upload/layer.png`
           }
           style={styles.imageBg}
         >
@@ -121,8 +121,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     left: 20,
-    top: 50,
-    // position: "absolute",
+    top: Platform.OS === "ios" ? 50 : 10,
   },
   imageBg: {
     backgroundColor: Colors.primary,
@@ -133,7 +132,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.1)",
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
     flex: 1,
     justifyContent: "space-between",
   },

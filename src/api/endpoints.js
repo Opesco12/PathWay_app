@@ -31,4 +31,5 @@ export const endpoints = {
   getClientBanks: "/getclientbankaccounts",
   createBank: "/createbankaccount",
   withdraw: "/debitwallet",
+  clientRelationshipManager: "/getclientrelationshipmanager",
 };

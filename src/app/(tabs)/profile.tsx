@@ -4,10 +4,14 @@ import { Link, router } from "expo-router";
 import {
   Book,
   ClipboardTick,
+  DocumentText,
+  Global,
   Headphone,
   Lock1,
   LogoutCurve,
+  MessageText1,
   Profile as ProfileIcon,
+  Security,
   UserOctagon,
 } from "iconsax-react-native";
 
@@ -20,8 +24,11 @@ import { retrieveUserData } from "@/src/storage/userData";
 import { logout } from "@/src/api";
 import { Pressable } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import { useChat } from "@/src/context/ChatContext";
 
 const Profile = () => {
+  const { toggleModal } = useChat();
+
   const [fullname, setFullname] = useState(null);
   const [authToken, setAuthToken] = useState(null);
 
@@ -50,7 +57,7 @@ const Profile = () => {
           justifyContent: "space-between",
         }}
       >
-        <View style={{ marginVertical: 25 }}>
+        <View style={{ marginTop: 25 }}>
           <StyledText
             type="heading"
             variant="semibold"
@@ -69,6 +76,32 @@ const Profile = () => {
           source={require("../../../assets/images/layer.png")}
           style={{ height: 50, width: 50, borderRadius: 25 }}
         />
+      </View>
+
+      <View
+        style={{
+          borderColor: Colors.border,
+          borderWidth: 1,
+          borderLeftWidth: 0,
+          borderRightWidth: 0,
+          marginVertical: 10,
+          paddingVertical: 10,
+        }}
+      >
+        <StyledText
+          variant="medium"
+          color={Colors.primary}
+        >
+          PathWay Account ID:{" "}
+          <StyledText color={Colors.light}>0986789</StyledText>
+        </StyledText>
+        <StyledText
+          variant="medium"
+          color={Colors.primary}
+        >
+          Wallet Account Number:{" "}
+          <StyledText color={Colors.light}>0986789</StyledText>
+        </StyledText>
       </View>
 
       <View>
@@ -126,7 +159,7 @@ const Profile = () => {
             </AppListItem>
           </Link>
           <Link
-            href={"/"}
+            href={"/contact-manager"}
             asChild
           >
             <AppListItem
@@ -155,7 +188,57 @@ const Profile = () => {
               Change Password
             </AppListItem>
           </Link>
+
+          <Link
+            href={""}
+            asChild
+          >
+            <AppListItem
+              leftIcon={
+                <Global
+                  size={20}
+                  color={Colors.primary}
+                />
+              }
+            >
+              Visit our website
+            </AppListItem>
+          </Link>
+
+          <Link
+            href={""}
+            asChild
+          >
+            <AppListItem
+              leftIcon={
+                <DocumentText
+                  size={20}
+                  color={Colors.primary}
+                />
+              }
+            >
+              Terms and Conditions
+            </AppListItem>
+          </Link>
+
+          <Link
+            href={""}
+            asChild
+          >
+            <AppListItem
+              leftIcon={
+                <Security
+                  size={20}
+                  color={Colors.primary}
+                />
+              }
+            >
+              Privacy Policy
+            </AppListItem>
+          </Link>
+
           <AppListItem
+            onPress={toggleModal}
             leftIcon={
               <Headphone
                 size={20}
@@ -165,10 +248,30 @@ const Profile = () => {
           >
             Help & Support
           </AppListItem>
+
+          <Link
+            href={""}
+            asChild
+          >
+            <AppListItem
+              leftIcon={
+                <MessageText1
+                  size={20}
+                  color={Colors.primary}
+                />
+              }
+            >
+              FAQs
+            </AppListItem>
+          </Link>
         </View>
       </View>
 
-      <View style={{ flex: 1, justifyContent: "flex-end", paddingBottom: 20 }}>
+      <View
+        style={{
+          marginVertical: 30,
+        }}
+      >
         <Pressable onPress={logoutUser}>
           <View style={styles.signout}>
             <LogoutCurve

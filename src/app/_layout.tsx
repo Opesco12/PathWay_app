@@ -8,6 +8,9 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import FlashMessage from "react-native-flash-message";
 
+import { ChatProvider } from "../context/ChatContext";
+import TawkToChat from "../components/AppChatBox";
+
 export { ErrorBoundary } from "expo-router";
 
 export const unstable_settings = {
@@ -51,8 +54,8 @@ function RootLayoutNav() {
         screenOptions={{ headerShown: false, animation: "ios_from_right" }}
       >
         <Stack.Screen name="index" />
-        {/* <Stack.Screen name="(auth)" /> */}
-        {/* <Stack.Screen name="(app)" /> */}
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(app)" />
         <Stack.Screen name="(tabs)" />
       </Stack>
       <FlashMessage

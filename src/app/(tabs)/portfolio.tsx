@@ -4,12 +4,10 @@ import {
   Money4,
   Moneys,
   TrendUp,
-  Clock,
-  PercentageCircle,
-  Calendar,
 } from "iconsax-react-native";
 import { useEffect, useState } from "react";
 import { router } from "expo-router";
+import _ from "lodash";
 
 import LayeredScreen from "@/src/components/LayeredScreen";
 import StyledText from "@/src/components/StyledText";
@@ -29,33 +27,7 @@ import Product from "@/src/components/Product";
 
 const PortfolioList = ({ product }) => {
   const [fixedIncomeBalance, setFixedIncomeBalance] = useState(0);
-  function convertToKebabCase(inputString) {
-    inputString = inputString?.trim();
 
-    inputString = inputString?.toLowerCase();
-
-    inputString = inputString?.replace(/\s+/g, "-");
-
-    return inputString;
-  }
-  const products = [
-    "UTLAM MONEY MARKET PLAN",
-    "UTLAM LIFESTYLE ACCOUNT",
-    "UTLAM LIQUIDITY MANAGER",
-    "UTLAM TARGET SAVINGS",
-    "UTLAM FIXED INCOME STRATEGY",
-    "UTLAM BALANCED STRATEGY",
-    "UTLAM GROWTH STRATEGY",
-    "UTLAM FIXED INCOME PLAN",
-    "UTLAM BALANCE PLAN",
-    "UTLAM GROWTH PLAN",
-  ];
-
-  var imageUrl = products.includes(product.portfolio)
-    ? `https://firebasestorage.googleapis.com/v0/b/utlam-a1951.appspot.com/o/${convertToKebabCase(
-        product.portfolio
-      )}.webp?alt=media&token=9fbb64ae-96b9-49e1-`
-    : `https://firebasestorage.googleapis.com/v0/b/utlam-a1951.appspot.com/o/utlam-default.webp?alt=media&token=9fbb64ae-96b9-49e1-`;
   useEffect(() => {
     if (product.portfolioType === 9) {
       var balance = 0;
@@ -68,8 +40,22 @@ const PortfolioList = ({ product }) => {
     }
   }, []);
 
-  // console.log(product);
-
+  const getProductImage = (productName) => {
+    const products = [
+      "pathway_money_market_note",
+      "pathway_fixed_income_note",
+      "pathway_fixed_deposit_note",
+      "pathway_dollar_note",
+      "pathway_hybrid_note",
+    ];
+    if (products.includes(_.snakeCase(productName))) {
+      return `https://res.cloudinary.com/dtu6cxvk6/image/upload/${_.snakeCase(
+        productName
+      )}.png`;
+    } else {
+      return `https://res.cloudinary.com/dtu6cxvk6/image/upload/default.png`;
+    }
+  };
   return (
     <ContentBox
       customStyles={{
@@ -86,7 +72,7 @@ const PortfolioList = ({ product }) => {
             pathname: "/(app)/portfolio-details",
             params: {
               header: product?.portfolio,
-              headerImageUrl: imageUrl,
+              headerImageUrl: getProductImage(product?.portfolio),
               product: JSON.stringify(product),
               portfolioId: product.portfolioId,
               portfolioType: product.portfolioType,
@@ -152,6 +138,7 @@ const PortfolioList = ({ product }) => {
 
 const Portfolio = () => {
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [totalBalance, setTotalBalance] = useState(0);
   const [userBalance, setUserBalance] = useState({
     currencyCode: "",
@@ -190,25 +177,32 @@ const Portfolio = () => {
     });
   };
 
+  const fetchData = async () => {
+    setLoading(true);
+
+    const userBalance = await getWalletBalance();
+    setUserBalance({
+      currencyCode: userBalance[0].currencyCode,
+      amount: userBalance[0].amount,
+    });
+
+    // const userPortfolio = await getClientPortfolio();
+    const mutualFundBalances = await getMutualFundOnlineBalances();
+    setMutualFundBalances(mutualFundBalances);
+
+    const investibleProducts = await getProducts();
+    investibleProducts && updateFixedIncomePortfolio(investibleProducts);
+
+    setLoading(false);
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchData();
+    setRefreshing(false);
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-
-      const userBalance = await getWalletBalance();
-      setUserBalance({
-        currencyCode: userBalance[0].currencyCode,
-        amount: userBalance[0].amount,
-      });
-
-      // const userPortfolio = await getClientPortfolio();
-      const mutualFundBalances = await getMutualFundOnlineBalances();
-      setMutualFundBalances(mutualFundBalances);
-
-      const investibleProducts = await getProducts();
-      investibleProducts && updateFixedIncomePortfolio(investibleProducts);
-
-      setLoading(false);
-    };
     fetchData();
   }, []);
 
@@ -231,7 +225,11 @@ const Portfolio = () => {
   }, [fixedIncomePortfolio, mutualFundBalances, userBalance]);
 
   return (
-    <LayeredScreen headerText={"My Portfolio"}>
+    <LayeredScreen
+      headerText={"My Portfolio"}
+      refreshing={refreshing}
+      onRefresh={onRefresh}
+    >
       {loading ? (
         <Loader />
       ) : (

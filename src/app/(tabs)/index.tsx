@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { StatusBar as ExpoStatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import {
   EmptyWallet,
   Notification,
@@ -30,7 +30,10 @@ import {
   Copy,
   Refresh2,
   ProfileCircle,
+  Bank,
 } from "iconsax-react-native";
+import { Formik } from "formik";
+import * as Yup from "yup";
 
 import { Colors } from "@/src/constants/Colors";
 import StyledText from "@/src/components/StyledText";
@@ -39,7 +42,12 @@ import AppRipple from "@/src/components/AppRipple";
 import AppModal from "@/src/components/AppModal";
 
 import { retrieveUserData } from "@/src/storage/userData";
-import { getVirtualAccounts, getWalletBalance } from "@/src/api";
+import {
+  getVirtualAccounts,
+  getWalletBalance,
+  debitWallet,
+  getclientbankaccounts,
+} from "@/src/api";
 
 import Screen from "@/src/components/Screen";
 
@@ -48,10 +56,14 @@ import { showMessage } from "react-native-flash-message";
 import { Link, router } from "expo-router";
 import { copyToClipboard } from "../../helperFunctions/copyToClipboard";
 import { amountFormatter } from "../../helperFunctions/amountFormatter";
+import CenterModal from "@/src/components/AppCenterModal";
 import ContentBox from "@/src/components/ContentBox";
+import AppTextField from "@/src/components/AppTextField";
+import { useChat } from "@/src/context/ChatContext";
 
 const index = () => {
   const [loading, setIsLading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const screenWidth = Dimensions.get("screen").width;
   const [userData, setUserData] = useState(null);
@@ -60,11 +72,10 @@ const index = () => {
     currencyCode: "",
     amount: 0,
   });
-  const [userVirtualAccounts, setUserVirtualAccounts] = useState([]);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+  const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
   const [hideBalance, setHideBalance] = useState(false);
   const [virtualAccount, setVirtualAccount] = useState([]);
-  const [copiedText, setCopiedText] = useState("");
 
   const fetchData = async () => {
     setIsLading(true);
@@ -80,6 +91,7 @@ const index = () => {
     });
 
     const virtualAccounts = await getVirtualAccounts();
+    console.log("Virtual account: ", virtualAccounts);
     setVirtualAccount(virtualAccounts);
     setIsLading(false);
   };
@@ -93,6 +105,53 @@ const index = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const formikRef = useRef();
+
+  const withdrawalValidationSchema = Yup.object().shape({
+    amount: Yup.number()
+      .required("Withdrawal amount is required")
+      .positive("Withdrawal amount must be greater than ₦200")
+      .min(200, "Minimum withdrawal is ₦200")
+      .max(
+        userBalance.amount,
+        `Withdrawal amount cannot exceed your balance of ₦${userBalance.amount}`
+      ),
+  });
+  const withdrawalRequest = async (amount) => {
+    const userBanks = await getclientbankaccounts();
+
+    const requestData = {
+      currencyCode: "NGN",
+      amount: amount,
+      walletBankAccountNo: userBalance?.walletAccountNo,
+      beneficiaryBankAccountNo: userBanks[0]?.beneficiaryAccountNo,
+    };
+
+    if (amount > userBalance?.amount) {
+      showMessage({
+        message: "Insufficient Funds",
+        type: "warning",
+      });
+    } else {
+      const response = await debitWallet(requestData);
+      if (response?.message === "Success") {
+        showMessage({
+          message: "Wallet Withdrawal is being processed.",
+          description:
+            "Kindly note that withdrawals are processed within 24 hours",
+          type: "success",
+        });
+      } else {
+        showMessage({
+          message: "An error occured",
+          type: "warning",
+        });
+      }
+    }
+  };
+
+  const { toggleModal } = useChat();
 
   return (
     <>
@@ -220,7 +279,7 @@ const index = () => {
                     />
                   }
                   text="Deposit"
-                  onpress={() => console.log("Deposit modal pressed")}
+                  onpress={() => setIsDepositModalOpen(true)}
                 />
                 <Button
                   icon={
@@ -231,7 +290,7 @@ const index = () => {
                     />
                   }
                   text="Withdraw"
-                  onpress={() => console.log("Withdraw modal pressed")}
+                  onpress={() => setIsWithdrawModalOpen(true)}
                 />
               </View>
             </View>
@@ -363,6 +422,7 @@ const index = () => {
                     backgroundColor: Colors.lightSecondary,
                   }}
                   width={"48%"}
+                  onPress={toggleModal}
                 >
                   <Reserve
                     size={20}
@@ -383,6 +443,119 @@ const index = () => {
             </ContentBox>
           </View>
         </ScrollView>
+
+        <CenterModal
+          isVisible={isDepositModalOpen}
+          onClose={() => setIsDepositModalOpen(false)}
+          title="Deposit"
+          buttons={false}
+        >
+          <View
+            style={{
+              height: 80,
+              width: 80,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: Colors.lightBg,
+              borderRadius: 40,
+              alignSelf: "center",
+            }}
+          >
+            <Bank
+              size={40}
+              color={Colors.lightPrimary}
+            />
+          </View>
+          <StyledText
+            type="subheading"
+            variant="semibold"
+            style={{ marginVertical: 15, textAlign: "center" }}
+          >
+            Bank Transfer
+          </StyledText>
+          <StyledText
+            type="body"
+            style={{ marginVertical: 15 }}
+            style={{ textAlign: "center", opacity: 0.8, marginBottom: 30 }}
+          >
+            Send money to the bank account details below {"\n"}
+            {/* {`Please note that there is a ${amountFormatter.format(
+              100
+            )} charge for Wallet Top-up`} */}
+          </StyledText>
+
+          <View style={{ marginBottom: 20 }}>
+            {virtualAccount.map((account, index) => (
+              <View
+                key={index}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  borderWidth: 0.5,
+                  borderColor: Colors.border,
+                  padding: 10,
+                  borderRadius: 10,
+                  gap: 10,
+                }}
+              >
+                <View>
+                  <StyledText
+                    variant="medium"
+                    color={Colors.secondary}
+                  >
+                    {account?.virtualAccountNo}
+                  </StyledText>
+                  <StyledText color={Colors.light}>
+                    {account?.virtualAccountName}
+                  </StyledText>
+                  <StyledText variant="medium">
+                    {account?.virtualAccountBankName
+                      ? account?.virtualAccountBankName
+                      : "Rand Merchant Bank"}
+                  </StyledText>
+                </View>
+
+                <Copy
+                  size={25}
+                  color={Colors.lightPrimary}
+                  onPress={async () => {
+                    await copyToClipboard(account?.virtualAccountNo);
+                    setIsDepositModalOpen(false);
+                  }}
+                />
+              </View>
+            ))}
+          </View>
+        </CenterModal>
+        <CenterModal
+          isVisible={isWithdrawModalOpen}
+          onClose={() => !isSubmitting && setIsWithdrawModalOpen(false)}
+          title="Withdraw"
+          primaryButtonText="Withdraw"
+          onPrimaryPress={() => formikRef.current?.handleSubmit()}
+        >
+          <Formik
+            innerRef={formikRef}
+            initialValues={{ amount: "" }}
+            onSubmit={async (values) => {
+              setIsSubmitting(true);
+              const { amount } = values;
+
+              await withdrawalRequest(amount);
+              setIsSubmitting(false);
+            }}
+            validationSchema={withdrawalValidationSchema}
+          >
+            {({ handleChange }) => (
+              <AppTextField
+                name="amount"
+                onChangeText={handleChange("amount")}
+                label="Amount"
+              />
+            )}
+          </Formik>
+        </CenterModal>
       </View>
     </>
   );

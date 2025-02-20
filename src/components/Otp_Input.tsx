@@ -16,40 +16,22 @@ const Otp_Input = ({
     try {
       const clipboardContent = await Clipboard.getStringAsync();
       if (clipboardContent) {
-        const newCode = [...code];
-        const validPastedData = clipboardContent.slice(0, codeLength);
+        const validPastedData = clipboardContent
+          .replace(/[^0-9]/g, "") // Remove non-numeric characters
+          .slice(0, codeLength);
 
-        for (let i = 0; i < validPastedData.length; i++) {
-          if (/^\d$/.test(validPastedData[i])) {
-            newCode[i] = validPastedData[i];
-          }
-        }
+        if (validPastedData.length === codeLength) {
+          setCode(validPastedData.split(""));
 
-        setCode(newCode);
-
-        // Focus on the next empty input or the last input
-        const nextEmptyIndex = newCode.findIndex((digit) => digit === "");
-        const focusIndex =
-          nextEmptyIndex === -1 ? codeLength - 1 : nextEmptyIndex;
-        inputRefs.current[focusIndex].focus();
-
-        if (newCode.every((digit) => digit !== "")) {
-          onCodeFilled && onCodeFilled(newCode.join(""));
+          // Notify that the code is filled
+          onCodeFilled && onCodeFilled(validPastedData);
+        } else {
+          Alert.alert("Invalid Code", "The pasted code is not valid.");
         }
       }
     } catch (error) {
       console.error("Failed to read clipboard:", error);
     }
-  };
-
-  const handleLongPress = () => {
-    Alert.alert("Paste OTP", "Do you want to paste the OTP from clipboard?", [
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
-      { text: "Paste", onPress: handlePaste },
-    ]);
   };
 
   const handleChange = (text, index) => {
@@ -72,6 +54,16 @@ const Otp_Input = ({
     }
   };
 
+  const handleLongPress = () => {
+    Alert.alert("Paste Code", "Do you want to paste the code from clipboard?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      { text: "Paste", onPress: handlePaste },
+    ]);
+  };
+
   return (
     <View style={styles.container}>
       {code.map((digit, index) => (
@@ -87,7 +79,7 @@ const Otp_Input = ({
           value={digit}
           onChangeText={(text) => handleChange(text, index)}
           onKeyPress={(event) => handleKeyPress(event, index)}
-          onLongPress={handleLongPress}
+          onPressIn={index === 0 ? handleLongPress : undefined}
         />
       ))}
     </View>

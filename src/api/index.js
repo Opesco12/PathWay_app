@@ -654,3 +654,18 @@ export const debitWallet = async (requestData) => {
     });
   }
 };
+
+export const getRelationshipManager = async () => {
+  try {
+    const data = await apiCall({
+      endpoint: endpoints.clientRelationshipManager,
+    });
+    return data;
+  } catch (error) {
+    console.error(error);
+    showMessage({
+      message: "An error occured",
+      type: "warning",
+    });
+  }
+};

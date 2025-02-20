@@ -9,14 +9,14 @@ const FilterBox = ({ text, onPress, selected, style }) => {
       style={[
         styles.container,
         style,
-        { borderColor: selected ? Colors.primary : Colors.lightPrimary },
+        { borderColor: selected ? Colors.primary : Colors.primary },
       ]}
       onPress={onPress}
     >
       <StyledText
         type="body"
         variant="medium"
-        color={selected ? Colors.white : Colors.lightPrimary}
+        color={selected ? Colors.white : Colors.primary}
       >
         {text}
       </StyledText>
