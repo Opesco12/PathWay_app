@@ -556,7 +556,7 @@ const index = () => {
                 size={25}
                 color={Colors.lightPrimary}
                 onPress={async () => {
-                  await copyToClipboard(account?.virtualAccountNo);
+                  await copyToClipboard(wallet?.accountNo);
                   setIsDepositModalOpen(false);
                 }}
               />
