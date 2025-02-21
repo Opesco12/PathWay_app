@@ -93,7 +93,6 @@ const ResetPassword = () => {
           }}
           onSubmit={async (values) => {
             const { email, password, token } = values;
-            console.log("Got here");
             setLoading(true);
             if (isEmailRegistered === true) {
               const response = await resetPassword(token, password);

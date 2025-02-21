@@ -1,4 +1,10 @@
-import { View, StyleSheet, ActivityIndicator } from "react-native";
+import {
+  View,
+  KeyboardAvoidingView,
+  ActivityIndicator,
+  Platform,
+  ScrollView,
+} from "react-native";
 import { useEffect, useState } from "react";
 import { AddCircle, Bank } from "iconsax-react-native";
 import { Formik } from "formik";
@@ -36,7 +42,7 @@ const BankDetails = () => {
       const banklist = await getBanks();
       setBanks(
         banklist.map((item) => ({
-          label: item.bankName,
+          label: item.bankName.split("-")[0],
           value: item.companyId,
         }))
       );
@@ -63,7 +69,17 @@ const BankDetails = () => {
       .max(100, "Account name can be at most 100 characters"),
   });
 
-  if (loading) return <Loader />;
+  if (loading)
+    return (
+      <Screen>
+        <AppHeader />
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <Loader />
+        </View>
+      </Screen>
+    );
 
   return (
     <Screen>
@@ -110,6 +126,10 @@ const BankDetails = () => {
         </ContentBox>
       )}
 
+      {/* <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+      > */}
       <AppModal
         isModalVisible={isModalVisible}
         setIsModalVisible={!isSubmitting && setIsModalVisible}
@@ -187,7 +207,7 @@ const BankDetails = () => {
                 />
                 <AppButton
                   onPress={handleSubmit}
-                  customStyles={{ marginVertical: 20 }}
+                  customStyles={{ marginVertical: 10 }}
                 >
                   {isSubmitting === true ? (
                     <ActivityIndicator size={"small"} />
@@ -200,6 +220,7 @@ const BankDetails = () => {
           )}
         </Formik>
       </AppModal>
+      {/* </KeyboardAvoidingView> */}
     </Screen>
   );
 };

@@ -4,15 +4,12 @@ import {
   SafeAreaView,
   StatusBar,
   StyleSheet,
-  Text,
   View,
   RefreshControl,
   KeyboardAvoidingView,
 } from "react-native";
-import { StatusBar as ExpoStatusBar } from "expo-status-bar";
 
 import { Colors } from "@/src/constants/Colors";
-// import KeyboardAvoidingWrapper from "./KeyboardAvoidingWrapper";
 
 const statusBarHeight = StatusBar.currentHeight;
 
@@ -80,7 +77,6 @@ const Screen = ({
                   {children}
                 </ScrollView>
               </SafeAreaView>
-              e
             </KeyboardAvoidingView>
           </View>
         </>

@@ -1,4 +1,4 @@
-import { Image, StyleSheet, View, KeyboardAvoidingView } from "react-native";
+import { Image, StyleSheet, View, Linking } from "react-native";
 import { useEffect, useState } from "react";
 import { Link, router } from "expo-router";
 import {
@@ -21,7 +21,7 @@ import { Colors } from "@/src/constants/Colors";
 import StyledText from "@/src/components/StyledText";
 import AppListItem from "@/src/components/AppListItem";
 import { retrieveUserData } from "@/src/storage/userData";
-import { logout } from "@/src/api";
+import { getWalletBalance, logout } from "@/src/api";
 import { Pressable } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useChat } from "@/src/context/ChatContext";
@@ -31,6 +31,7 @@ const Profile = () => {
 
   const [fullname, setFullname] = useState(null);
   const [authToken, setAuthToken] = useState(null);
+  const [wallet, setWallet] = useState({ accountNo: "", name: "" });
 
   const logoutUser = async () => {
     const data = await logout(authToken);
@@ -40,12 +41,23 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      const userProfile = await getWalletBalance();
+      setWallet({
+        accountNo: userProfile[0].walletAccountNo,
+        name: userProfile[0].walletAccountName,
+      });
+
       const userData = await retrieveUserData();
       setFullname(userData?.fullName);
       setAuthToken(userData?.token);
     };
     fetchData();
   }, []);
+
+  const openWebsite = () => {
+    Linking.openURL("https://pathway.ng/");
+  };
+
   return (
     <Screen>
       <StatusBar style="dark" />
@@ -72,10 +84,6 @@ const Profile = () => {
             {fullname}
           </StyledText>
         </View>
-        <Image
-          source={require("../../../assets/images/layer.png")}
-          style={{ height: 50, width: 50, borderRadius: 25 }}
-        />
       </View>
 
       <View
@@ -91,16 +99,17 @@ const Profile = () => {
         <StyledText
           variant="medium"
           color={Colors.primary}
+          numberOfLines={1}
         >
           PathWay Account ID:{" "}
-          <StyledText color={Colors.light}>0986789</StyledText>
+          <StyledText color={Colors.light}>{wallet?.name}</StyledText>
         </StyledText>
         <StyledText
           variant="medium"
           color={Colors.primary}
         >
           Wallet Account Number:{" "}
-          <StyledText color={Colors.light}>0986789</StyledText>
+          <StyledText color={Colors.light}>{wallet?.accountNo}</StyledText>
         </StyledText>
       </View>
 
@@ -189,21 +198,17 @@ const Profile = () => {
             </AppListItem>
           </Link>
 
-          <Link
-            href={""}
-            asChild
+          <AppListItem
+            onPress={openWebsite}
+            leftIcon={
+              <Global
+                size={20}
+                color={Colors.primary}
+              />
+            }
           >
-            <AppListItem
-              leftIcon={
-                <Global
-                  size={20}
-                  color={Colors.primary}
-                />
-              }
-            >
-              Visit our website
-            </AppListItem>
-          </Link>
+            Visit our website
+          </AppListItem>
 
           <Link
             href={""}

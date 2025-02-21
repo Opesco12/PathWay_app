@@ -75,6 +75,7 @@ const index = () => {
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
   const [hideBalance, setHideBalance] = useState(false);
+  const [wallet, setWallet] = useState({});
   const [virtualAccount, setVirtualAccount] = useState([]);
 
   const fetchData = async () => {
@@ -85,6 +86,10 @@ const index = () => {
 
     const userBalance = await getWalletBalance();
     console.log(userBalance);
+    setWallet({
+      name: userBalance[0].walletAccountName,
+      accountNo: userBalance[0].walletAccountNo,
+    });
     setUserBalance({
       currencyCode: userBalance[0].currencyCode,
       amount: userBalance[0].amount,
@@ -228,6 +233,7 @@ const index = () => {
                 />
                 <StyledText color={Colors.white}> Wallet Balance</StyledText>
               </View>
+
               <View
                 style={{
                   flexDirection: "row",
@@ -260,6 +266,39 @@ const index = () => {
                     onPress={() => setHideBalance(!hideBalance)}
                   />
                 )}
+              </View>
+
+              <View style={{ marginVertical: 15, gap: 5 }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 10,
+                  }}
+                >
+                  <StyledText
+                    color={Colors.white}
+                    style={{ textAlign: "center" }}
+                  >
+                    {" "}
+                    Wallet Account Number: {wallet?.accountNo}{" "}
+                  </StyledText>
+                  <Copy
+                    size={25}
+                    color={Colors.lightPrimary}
+                    onPress={async () => {
+                      await copyToClipboard(wallet?.accountNo);
+                    }}
+                  />
+                </View>
+                <StyledText
+                  color={Colors.white}
+                  style={{ textAlign: "center" }}
+                >
+                  {" "}
+                  Wallet Account Name: {wallet?.name}
+                </StyledText>
               </View>
 
               <View
@@ -485,47 +524,43 @@ const index = () => {
           </StyledText>
 
           <View style={{ marginBottom: 20 }}>
-            {virtualAccount.map((account, index) => (
-              <View
-                key={index}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  borderWidth: 0.5,
-                  borderColor: Colors.border,
-                  padding: 10,
-                  borderRadius: 10,
-                  gap: 10,
-                }}
-              >
-                <View>
-                  <StyledText
-                    variant="medium"
-                    color={Colors.secondary}
-                  >
-                    {account?.virtualAccountNo}
-                  </StyledText>
-                  <StyledText color={Colors.light}>
-                    {account?.virtualAccountName}
-                  </StyledText>
-                  <StyledText variant="medium">
+            <View
+              key={index}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                borderWidth: 0.5,
+                borderColor: Colors.border,
+                padding: 10,
+                borderRadius: 10,
+                gap: 10,
+              }}
+            >
+              <View>
+                <StyledText
+                  variant="medium"
+                  color={Colors.secondary}
+                >
+                  {wallet?.accountNo}
+                </StyledText>
+                <StyledText color={Colors.light}>{wallet?.name}</StyledText>
+                {/* <StyledText variant="medium">
                     {account?.virtualAccountBankName
                       ? account?.virtualAccountBankName
                       : "Rand Merchant Bank"}
-                  </StyledText>
-                </View>
-
-                <Copy
-                  size={25}
-                  color={Colors.lightPrimary}
-                  onPress={async () => {
-                    await copyToClipboard(account?.virtualAccountNo);
-                    setIsDepositModalOpen(false);
-                  }}
-                />
+                  </StyledText> */}
               </View>
-            ))}
+
+              <Copy
+                size={25}
+                color={Colors.lightPrimary}
+                onPress={async () => {
+                  await copyToClipboard(account?.virtualAccountNo);
+                  setIsDepositModalOpen(false);
+                }}
+              />
+            </View>
           </View>
         </CenterModal>
         <CenterModal

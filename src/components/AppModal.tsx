@@ -1,12 +1,4 @@
-import {
-  Modal,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
-import { useState } from "react";
+import { StyleSheet, View, KeyboardAvoidingView, Platform } from "react-native";
 import ReactNativeModal from "react-native-modal";
 
 import { Colors } from "@/src/constants/Colors";
@@ -27,18 +19,24 @@ const AppModal = ({
       onBackdropPress={() => setIsModalVisible(false)}
       onSwipeComplete={() => setIsModalVisible(false)}
     >
-      <View
-        style={[
-          styles.modalContent,
-          {
-            minHeight: modalHeight ? modalHeight : 300,
-          },
-          style,
-        ]}
+      <KeyboardAvoidingView
+        style={{ marginBottom: 0 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        // keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
       >
-        <View style={styles.line}></View>
-        {children}
-      </View>
+        <View
+          style={[
+            styles.modalContent,
+            {
+              minHeight: modalHeight ? modalHeight : 300,
+            },
+            style,
+          ]}
+        >
+          <View style={styles.line}></View>
+          {children}
+        </View>
+      </KeyboardAvoidingView>
     </ReactNativeModal>
   );
 };
@@ -55,7 +53,8 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: Colors.white,
-    borderRadius: 15,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
     paddingHorizontal: 20,
     paddingVertical: 10,
     overflow: "hidden",

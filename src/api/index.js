@@ -58,6 +58,10 @@ const apiCall = async ({
     console.error("API call error:", error);
     console.log(typeof error.status);
     if (error.status === 401) {
+      showMessage({
+        message: "Session expired, please login again",
+        type: "warning",
+      });
       return router.replace("/(auth)/login");
     }
     throw error;
