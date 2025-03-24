@@ -62,6 +62,7 @@ function RootLayoutNav() {
         position="top"
         style={{
           paddingTop: Platform.OS === "android" && StatusBar.currentHeight,
+          zIndex: 100,
         }}
       />
     </>

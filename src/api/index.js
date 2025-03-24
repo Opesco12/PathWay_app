@@ -1,12 +1,10 @@
 import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { endpoints } from "./endpoints";
-import keys from "../storage/keys";
 import { retrieveUserData } from "../storage/userData";
 import { showMessage } from "react-native-flash-message";
 import { Redirect, router } from "expo-router";
 
-const BASE_URL = "https://pathway-proxy.vercel.app/api/v1";
+const BASE_URL = "https://pathway-proxy-server.vercel.app/api/v1";
 
 const getAuthToken = async () => {
   const data = await retrieveUserData();
@@ -671,5 +669,61 @@ export const getRelationshipManager = async () => {
       message: "An error occured",
       type: "warning",
     });
+  }
+};
+
+export const fetchClientPhoto = async () => {
+  try {
+    const data = await apiCall({
+      endpoint: endpoints.getClientPhoto,
+      method: "GET",
+    });
+    return data;
+  } catch (error) {
+    console.error(error);
+    //  showMessage({message: "An error occured while fetching photo", type: "warning"});
+  }
+};
+
+export const uploadImage = async (file) => {
+  try {
+    let base64String = file.base64;
+    if (base64String.length > 1000000) {
+      base64String = base64String.substring(0, base64String.length / 2);
+    }
+
+    const requestBody = {
+      base64: file?.base64,
+      filename: file?.fileName || `image_${Date.now()}.jpg`,
+    };
+
+    const token = await getAuthToken();
+
+    const response = await fetch(
+      `https://pathway-proxy-server.vercel.app/api/v1/${endpoints.uploadClientPhoto}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestBody),
+      }
+    );
+
+    // Check response status
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Upload failed:", errorText);
+      throw new Error(`Upload failed: ${response.status}`);
+    }
+
+    // Parse and return response data
+    const responseData = await response.json();
+    return responseData;
+  } catch (error) {
+    console.error("Upload error:", error);
+    showMessage({ message: "Upload Failed!", type: "warning" });
+    throw error;
   }
 };

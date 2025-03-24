@@ -54,13 +54,8 @@ const BankDetails = () => {
   }, []);
 
   const validationSchema = Yup.object().shape({
-    accountNumber: Yup.number()
-      .typeError("Account number must be a number")
-      .test(
-        "len",
-        "Account number must be exactly 10 digits",
-        (val) => val && String(val).length === 10
-      )
+    accountNumber: Yup.string()
+      .matches(/^\d{10}$/, "Account number must be exactly 10 digits")
       .required("Account number is required"),
 
     accountName: Yup.string()

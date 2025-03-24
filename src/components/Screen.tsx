@@ -33,8 +33,8 @@ const Screen = ({
           >
             <KeyboardAvoidingView
               style={{ flex: 1, backgroundColor: Colors.white }}
-              behavior={"height"}
-              keyboardVerticalOffset={0}
+              // behavior={"height"}
+              // keyboardVerticalOffset={0}
             >
               <ScrollView
                 showsHorizontalScrollIndicator={false}

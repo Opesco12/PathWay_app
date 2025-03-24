@@ -23,6 +23,7 @@
     "@rneui/base": "^4.0.0-rc.7",
     "@rneui/themed": "^4.0.0-rc.8",
     "axios": "^1.7.9",
+    "eas-cli": "^15.0.13",
     "expo": "~52.0.25",
     "expo-blur": "~14.0.2",
     "expo-clipboard": "~7.0.1",
@@ -57,11 +58,14 @@
     "react-native-screens": "~4.4.0",
     "react-native-web": "~0.19.13",
     "react-native-webview": "13.12.5",
-    "yup": "^1.6.1"
+    "semver": "^7.7.1",
+    "yup": "^1.6.1",
+    "expo-dev-client": "~5.0.12"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/jest": "^29.5.12",
+    "@types/lodash": "^4.17.15",
     "@types/react": "~18.3.12",
     "@types/react-test-renderer": "^18.3.0",
     "jest": "^29.2.1",

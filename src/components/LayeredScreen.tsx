@@ -27,6 +27,8 @@ const LayeredScreen = ({
   headerText,
   refreshing = false,
   onRefresh,
+  sticky = true,
+  backButton,
   ...props
 }) => {
   const navigation = useNavigation();
@@ -34,11 +36,7 @@ const LayeredScreen = ({
   const HEADER_HEIGHT = Platform.OS === "ios" ? 240 : 200;
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1 }}
-    >
-      {/* Header as an absolute component */}
+    <>
       <View style={[styles.imageContainer, { height: HEADER_HEIGHT }]}>
         <ImageBackground
           src={
@@ -48,6 +46,15 @@ const LayeredScreen = ({
           }
           style={styles.imageBg}
         >
+          {backButton && (
+            <MaterialCommunityIcons
+              name="chevron-left"
+              color={Colors.white}
+              size={35}
+              style={{ left: 20, top: Platform.OS === "ios" ? -50 : -10 }}
+              onPress={() => navigation.goBack()}
+            />
+          )}
           {overlay ? (
             <View
               style={[
@@ -107,15 +114,20 @@ const LayeredScreen = ({
         }
         showsVerticalScrollIndicator={false}
       >
-        {children}
+        <KeyboardAvoidingView
+          // behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
+        >
+          {children}
+        </KeyboardAvoidingView>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   imageContainer: {
-    position: "absolute",
+    // position: "absolute",
     width: "100%",
     zIndex: 1,
   },
@@ -128,7 +140,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     justifyContent: "flex-end",
-    // paddingBottom: 10,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
@@ -141,7 +152,7 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     flexGrow: 1,
-    paddingTop: Platform.OS === "ios" ? 240 : 200, // Match HEADER_HEIGHT
+    // paddingTop: Platform.OS === "ios" ? 240 : 200,
     paddingBottom: 20,
   },
 });

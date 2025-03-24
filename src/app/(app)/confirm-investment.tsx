@@ -212,7 +212,7 @@ const ConfirmInvestment = ({ route }) => {
                       position: "center",
                       message: "Investment Successful",
                       description: `You have successfully invested ₦${
-                        amount && amount
+                        amount && amountFormatter.format(amount)
                       } in ${header && header}`,
                       style: {
                         padding: 15,

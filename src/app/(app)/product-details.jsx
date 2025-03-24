@@ -88,6 +88,8 @@ const ProductDetails = ({}) => {
         const liabilityProducts = await getLiabilityProducts(
           product.portfolioId
         );
+
+        console.log("liabilty products:", liabilityProducts);
         if (liabilityProducts) {
           setLiabilityProducts(liabilityProducts);
           const tenors = await getTenor(liabilityProducts[0].productId);
@@ -275,7 +277,7 @@ const ProductDetails = ({}) => {
                         setTimeout(() => {
                           setSubmitting(false);
                           router.push({
-                            pathname: "/confirm-investment",
+                            pathname: "/investment-simulation",
                             params: {
                               header: header,
                               headerImageUrl: headerImageUrl && headerImageUrl,
@@ -288,13 +290,13 @@ const ProductDetails = ({}) => {
                               tenor: selectedTenor,
                             },
                           });
-                        }, 5000);
+                        }, 3000);
                       }
                     } else {
                       setTimeout(() => {
                         setSubmitting(false);
                         router.push({
-                          pathname: "/confirm-investment",
+                          pathname: "/investment-simulation",
                           params: {
                             header: header,
                             headerImageUrl: headerImageUrl && headerImageUrl,
@@ -303,7 +305,7 @@ const ProductDetails = ({}) => {
                             portfolioTypeName: product?.portfolioTypeName,
                           },
                         });
-                      }, 5000);
+                      }, 3000);
                     }
                   }
                 }

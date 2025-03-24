@@ -13,6 +13,7 @@ import {
   Profile as ProfileIcon,
   Security,
   UserOctagon,
+  UserCirlceAdd,
 } from "iconsax-react-native";
 
 import Screen from "@/src/components/Screen";
@@ -21,10 +22,18 @@ import { Colors } from "@/src/constants/Colors";
 import StyledText from "@/src/components/StyledText";
 import AppListItem from "@/src/components/AppListItem";
 import { retrieveUserData } from "@/src/storage/userData";
-import { getWalletBalance, logout } from "@/src/api";
+import {
+  fetchClientPhoto,
+  uploadImage,
+  getWalletBalance,
+  logout,
+} from "@/src/api";
 import { Pressable } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useChat } from "@/src/context/ChatContext";
+import { set } from "lodash";
+import ProfileImageUploadModal from "@/src/components/ImageUploadModal";
+import { showMessage } from "react-native-flash-message";
 
 const Profile = () => {
   const { toggleModal } = useChat();
@@ -32,10 +41,12 @@ const Profile = () => {
   const [fullname, setFullname] = useState(null);
   const [authToken, setAuthToken] = useState(null);
   const [wallet, setWallet] = useState({ accountNo: "", name: "" });
+  const [profileImage, setProfileImage] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const logoutUser = async () => {
     const data = await logout(authToken);
-    console.log(data);
     router.replace("/(auth)/login");
   };
 
@@ -50,12 +61,32 @@ const Profile = () => {
       const userData = await retrieveUserData();
       setFullname(userData?.fullName);
       setAuthToken(userData?.token);
+
+      const profileImage = await fetchClientPhoto();
+      setProfileImage(profileImage?.photo);
     };
     fetchData();
   }, []);
 
   const openWebsite = () => {
     Linking.openURL("https://pathway.ng/");
+  };
+
+  const handleUpload = async () => {
+    try {
+      if (!selectedImage) {
+        showMessage({ message: "Please select an image", type: "warning" });
+      } else {
+        const response = await uploadImage(selectedImage);
+        if (response?.message === "Success") {
+          showMessage({ message: "Upload Succesful", type: "success" });
+          const profileImage = await fetchClientPhoto();
+          setProfileImage(profileImage?.photo);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -84,6 +115,24 @@ const Profile = () => {
             {fullname}
           </StyledText>
         </View>
+
+        {profileImage?.length > 0 ? (
+          <Image
+            src={`data:image/jpeg;base64,${profileImage}`}
+            style={{
+              height: 50,
+              width: 50,
+              borderRadius: 25,
+            }}
+          />
+        ) : (
+          <UserCirlceAdd
+            size={50}
+            color={Colors.light}
+            variant="Bold"
+            onPress={() => setIsModalVisible(true)}
+          />
+        )}
       </View>
 
       <View
@@ -293,6 +342,13 @@ const Profile = () => {
           </View>
         </Pressable>
       </View>
+      <ProfileImageUploadModal
+        isVisible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        onUpload={handleUpload}
+        selectedImage={selectedImage}
+        setSelectedImage={setSelectedImage}
+      />
     </Screen>
   );
 };
