@@ -15,7 +15,7 @@ const TransactionDetails = () => {
 
   console.log(transaction);
   return (
-    <Screen customStyles={{ backgroundColor: Colors.lightBg }}>
+    <Screen customStyles={{}}>
       <AppHeader />
 
       <View style={{ marginTop: 25 }}>

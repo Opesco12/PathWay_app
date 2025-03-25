@@ -102,10 +102,22 @@ const ProductDetails = ({}) => {
 
   const tenorOptions = productTenors?.map((tenor, index) => {
     return {
-      label: `${tenor.tenor} Days`,
-      value: tenor.tenor,
+      label: `${tenor?.tenor} Days`,
+      value: tenor?.tenor,
+      interestRate: tenor?.interestRate,
     };
   });
+
+  const tenorInterestRange = () => {
+    if (!tenorOptions || tenorOptions.length === 0) return "";
+
+    const sortedTenors = [...tenorOptions].sort((a, b) => a.value - b.value);
+
+    const minInterestRate = sortedTenors[0]?.interestRate;
+    const maxInterestRate = sortedTenors[sortedTenors.length - 1]?.interestRate;
+
+    return `${minInterestRate}-${maxInterestRate}%`;
+  };
 
   return (
     <LayeredScreen
@@ -173,7 +185,11 @@ const ProductDetails = ({}) => {
                 >
                   <SavingDetails
                     title={"Annualized Yield"}
-                    detail={product?.return + "%"}
+                    detail={
+                      product?.portfolioType === 9
+                        ? tenorInterestRange()
+                        : "Up to " + product?.return + "%"
+                    }
                     icon={
                       <PercentageCircle
                         variant="Bold"

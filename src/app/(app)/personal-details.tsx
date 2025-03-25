@@ -149,6 +149,7 @@ const PersonalDetails = () => {
         ) : (
           <View>
             <Formik
+              enableReinitialize={true}
               validationSchema={userProfileSchema}
               initialValues={
                 userHasNextOfKin > 0

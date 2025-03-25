@@ -19,13 +19,13 @@ import { showMessage } from "react-native-flash-message";
 const InvestmentSimulation = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [investmentProducts, setInvestmentProducts] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState({});
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [liabilityProduct, setLiabiltyProduct] = useState({});
   const [tenors, setTenors] = useState([]);
   const [selectedTenor, setSelectedTenor] = useState(null);
-  const [principal, setPrincipal] = useState(0);
+  const [principal, setPrincipal] = useState(null);
 
-  const { portfolioId, amount } = useLocalSearchParams();
+  const { portfolioId, amount, tenor } = useLocalSearchParams();
 
   const investmentOptions = useMemo(() => {
     return investmentProducts?.map((product) => ({
@@ -36,7 +36,8 @@ const InvestmentSimulation = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setPrincipal(Number(amount));
+      amount && setPrincipal(Number(amount));
+      tenor && setSelectedTenor(Number(tenor));
       try {
         const products = await getProducts();
         setInvestmentProducts(products);
@@ -122,7 +123,7 @@ const InvestmentSimulation = () => {
               headerImageUrl: getProductImage(
                 findSelectedProduct?.portfolioName
               ),
-              amount: amount,
+              amount: principal,
               portfolioId: findSelectedProduct?.portfolioId,
               portfolioTypeName: findSelectedProduct?.portfolioTypeName,
 
@@ -199,8 +200,10 @@ const InvestmentSimulation = () => {
               ₦
             </StyledText>
           }
-          value={principal.toString()}
+          value={principal ? principal.toString() : "0"}
           onChangeText={(value) => setPrincipal(Number(value))}
+          readOnly={amount ? true : false}
+          keyboardType="numeric"
         />
 
         <AppPicker
@@ -209,8 +212,9 @@ const InvestmentSimulation = () => {
           value={selectedProduct}
           placeholder={"Select Investment Product"}
           onValueChange={(value) => setSelectedProduct(value)}
+          clickable={amount ? false : true}
         />
-        {findSelectedProduct?.portfolioType !== 9 && (
+        {selectedProduct && findSelectedProduct?.portfolioType !== 9 && (
           <StyledText
             type="label"
             color={Colors.secondary}
@@ -230,6 +234,7 @@ const InvestmentSimulation = () => {
               value={selectedTenor}
               placeholder={"Select Tenor"}
               onValueChange={(value) => setSelectedTenor(value)}
+              clickable={amount ? false : true}
             />
             {selectedTenor && (
               <StyledText

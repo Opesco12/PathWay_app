@@ -3,14 +3,13 @@ import {
   StyleSheet,
   View,
   Pressable,
-  BackHandler,
-  ActivityIndicator,
   Text,
   ImageBackground,
   StatusBar,
   Platform,
   ScrollView,
   RefreshControl,
+  Image,
 } from "react-native";
 import { StatusBar as ExpoStatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
@@ -28,17 +27,14 @@ import {
   Eye,
   EyeSlash,
   Copy,
-  Refresh2,
-  ProfileCircle,
   Bank,
+  Calculator,
 } from "iconsax-react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
 
 import { Colors } from "@/src/constants/Colors";
 import StyledText from "@/src/components/StyledText";
-import LayeredScreen from "@/src/components/LayeredScreen";
-import AppRipple from "@/src/components/AppRipple";
 import AppModal from "@/src/components/AppModal";
 
 import { retrieveUserData } from "@/src/storage/userData";
@@ -47,11 +43,11 @@ import {
   getWalletBalance,
   debitWallet,
   getclientbankaccounts,
+  fetchClientPhoto,
 } from "@/src/api";
 
 import Screen from "@/src/components/Screen";
 
-import Banner from "@/assets/images/svg_images/Banner";
 import { showMessage } from "react-native-flash-message";
 import { Link, router } from "expo-router";
 import { copyToClipboard } from "../../helperFunctions/copyToClipboard";
@@ -62,11 +58,14 @@ import AppTextField from "@/src/components/AppTextField";
 import { useChat } from "@/src/context/ChatContext";
 
 const index = () => {
+  const { toggleModal } = useChat();
+  const screenWidth = Dimensions.get("screen").width;
+
   const [loading, setIsLading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const screenWidth = Dimensions.get("screen").width;
   const [userData, setUserData] = useState(null);
+  const [profileImage, setProfileImage] = useState("");
   const [firstname, setFirstname] = useState("");
   const [userBalance, setUserBalance] = useState({
     currencyCode: "",
@@ -80,6 +79,10 @@ const index = () => {
 
   const fetchData = async () => {
     setIsLading(true);
+
+    const profileImage = await fetchClientPhoto();
+    setProfileImage(profileImage?.photo);
+
     const data = await retrieveUserData();
     setUserData(data);
     setFirstname(data.fullName.split(" ")[0]);
@@ -98,6 +101,7 @@ const index = () => {
     const virtualAccounts = await getVirtualAccounts();
     console.log("Virtual account: ", virtualAccounts);
     setVirtualAccount(virtualAccounts);
+
     setIsLading(false);
   };
 
@@ -156,8 +160,6 @@ const index = () => {
     }
   };
 
-  const { toggleModal } = useChat();
-
   return (
     <>
       <View style={styles.container}>
@@ -203,11 +205,16 @@ const index = () => {
                   Hello, {firstname}
                 </StyledText>
 
-                <ProfileCircle
-                  color={Colors.secondary}
-                  variant="Bold"
-                  size={50}
-                />
+                <Pressable onPress={() => router.push("/(tabs)/profile")}>
+                  <Image
+                    src={`data:image/jpeg;base64,${profileImage}`}
+                    style={{
+                      height: 50,
+                      width: 50,
+                      borderRadius: 25,
+                    }}
+                  />
+                </Pressable>
               </View>
               <View
                 style={{
@@ -339,7 +346,6 @@ const index = () => {
               style={styles.gradient}
             />
           </ImageBackground>
-          {/* </View> */}
           <View
             style={{
               backgroundColor: Colors.primary,
@@ -372,33 +378,63 @@ const index = () => {
                   marginBottom: 15,
                 }}
               />
-              <ContentBox
-                customStyles={{
-                  backgroundColor: Colors.lightSecondary,
+
+              <View
+                style={{
                   flexDirection: "row",
                   justifyContent: "space-between",
-                  alignItems: "center",
                 }}
-                onPress={() => router.push("/(tabs)/products")}
               >
-                <View>
-                  <StyledText
-                    variant="semibold"
-                    type="subheading"
-                    style={{ width: "75%" }}
-                  >
-                    Invest Money
-                  </StyledText>
-                  <StyledText style={{ width: "75%" }}>
-                    Grow your wealth securely
-                  </StyledText>
-                </View>
-                <StatusUp
-                  size={45}
-                  color={Colors.secondary}
-                  variant="Bold"
-                />
-              </ContentBox>
+                <ContentBox
+                  customStyles={{
+                    backgroundColor: Colors.lightSecondary,
+                  }}
+                  width={"48%"}
+                  onPress={() => router.push("/(tabs)/products")}
+                >
+                  <StatusUp
+                    size={20}
+                    color={Colors.secondary}
+                    variant="Bold"
+                  />
+                  <View>
+                    <StyledText
+                      variant="semibold"
+                      type="subheading"
+                    >
+                      Invest Money
+                    </StyledText>
+                    <StyledText type="label">
+                      Grow your wealth securely
+                    </StyledText>
+                  </View>
+                </ContentBox>
+
+                <ContentBox
+                  customStyles={{
+                    backgroundColor: Colors.lightSecondary,
+                  }}
+                  width={"48%"}
+                  onPress={() => router.push("/(tabs)/portfolio")}
+                >
+                  <FavoriteChart
+                    size={20}
+                    color={Colors.secondary}
+                    variant="Bold"
+                  />
+                  <View>
+                    <StyledText
+                      variant="semibold"
+                      type="subheading"
+                    >
+                      My Portfolio
+                    </StyledText>
+                    <StyledText type="label">
+                      Track your investments at a glance
+                    </StyledText>
+                  </View>
+                </ContentBox>
+              </View>
 
               <ContentBox
                 customStyles={{
@@ -407,26 +443,30 @@ const index = () => {
                   justifyContent: "space-between",
                   alignItems: "center",
                 }}
-                onPress={() => router.push("/(tabs)/portfolio")}
+                onPress={() => router.push("/(app)/investment-simulation")}
               >
                 <View>
                   <StyledText
                     variant="semibold"
                     type="subheading"
+                    // style={{ width: "90%" }}
+                  >
+                    Investment Simulator
+                  </StyledText>
+                  <StyledText
+                    type="label"
                     style={{ width: "75%" }}
                   >
-                    My Portfolio
-                  </StyledText>
-                  <StyledText style={{ width: "75%" }}>
-                    Track your investments at a glance
+                    Simulate through different products
                   </StyledText>
                 </View>
-                <FavoriteChart
-                  size={45}
+                <Calculator
+                  size={35}
                   color={Colors.secondary}
                   variant="Bold"
                 />
               </ContentBox>
+
               <View
                 style={{
                   flexDirection: "row",
@@ -452,7 +492,9 @@ const index = () => {
                     >
                       Transactions
                     </StyledText>
-                    <StyledText>Monitor your financial activity</StyledText>
+                    <StyledText type="label">
+                      Monitor your financial activity
+                    </StyledText>
                   </View>
                 </ContentBox>
 
@@ -475,7 +517,9 @@ const index = () => {
                     >
                       Help Desk
                     </StyledText>
-                    <StyledText>Reliable support when you need it</StyledText>
+                    <StyledText type="label">
+                      Reliable support when you need it
+                    </StyledText>
                   </View>
                 </ContentBox>
               </View>
@@ -518,9 +562,6 @@ const index = () => {
             style={{ textAlign: "center", opacity: 0.8, marginBottom: 30 }}
           >
             Send money to the bank account details below {"\n"}
-            {/* {`Please note that there is a ${amountFormatter.format(
-              100
-            )} charge for Wallet Top-up`} */}
           </StyledText>
 
           <View style={{ marginBottom: 20 }}>
@@ -545,11 +586,6 @@ const index = () => {
                   {wallet?.accountNo}
                 </StyledText>
                 <StyledText color={Colors.light}>{wallet?.name}</StyledText>
-                {/* <StyledText variant="medium">
-                    {account?.virtualAccountBankName
-                      ? account?.virtualAccountBankName
-                      : "Rand Merchant Bank"}
-                  </StyledText> */}
               </View>
 
               <Copy

@@ -140,61 +140,59 @@ const Transactions = () => {
     fetchData();
   }, []);
   return (
-    <>
-      <Screen>
-        <AppHeader />
-        <StyledText
-          type="heading"
-          variant="semibold"
-          style={{ marginVertical: 25 }}
-        >
-          Transactions
-        </StyledText>
-        {loading ? (
-          <Loader />
-        ) : (
-          <>
+    <Screen>
+      <AppHeader />
+      <StyledText
+        type="heading"
+        variant="semibold"
+        style={{ marginVertical: 25 }}
+      >
+        Transactions
+      </StyledText>
+      {loading ? (
+        <Loader />
+      ) : (
+        <>
+          <View
+            style={{
+              marginBottom: 15,
+              flexDirection: "row",
+              gap: 10,
+              alignItems: "baseline",
+            }}
+          >
+            <StyledText variant="medium">
+              {formatDateToMonthYear(startdate)}
+            </StyledText>
+            <MaterialCommunityIcons
+              name="chevron-down"
+              size={20}
+              onPress={() => setIsModalVisible(true)}
+            />
+          </View>
+
+          {transactions?.length > 0 ? (
+            transactions.map((transaction, index) => (
+              <TransactionItem
+                key={index}
+                transaction={transaction}
+              />
+            ))
+          ) : (
             <View
               style={{
-                marginBottom: 15,
-                flexDirection: "row",
-                gap: 10,
-                alignItems: "baseline",
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              <StyledText variant="medium">
-                {formatDateToMonthYear(startdate)}
+              <StyledText color={Colors.light}>
+                Your transactions will appear here
               </StyledText>
-              <MaterialCommunityIcons
-                name="chevron-down"
-                size={20}
-                onPress={() => setIsModalVisible(true)}
-              />
             </View>
-
-            {transactions?.length > 0 ? (
-              transactions.map((transaction, index) => (
-                <TransactionItem
-                  key={index}
-                  transaction={transaction}
-                />
-              ))
-            ) : (
-              <View
-                style={{
-                  flex: 1,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <StyledText color={Colors.light}>
-                  Your transactions will appear here
-                </StyledText>
-              </View>
-            )}
-          </>
-        )}
-      </Screen>
+          )}
+        </>
+      )}
       <AppMonthPicker
         isVisible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
@@ -211,7 +209,7 @@ const Transactions = () => {
           }
         }}
       />
-    </>
+    </Screen>
   );
 };
 

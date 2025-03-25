@@ -37,90 +37,90 @@ const LayeredScreen = ({
 
   return (
     <>
-      <View style={[styles.imageContainer, { height: HEADER_HEIGHT }]}>
-        <ImageBackground
-          src={
-            headerImageUrl && headerImageUrl !== null
-              ? headerImageUrl
-              : `https://res.cloudinary.com/dtu6cxvk6/image/upload/layer.png`
-          }
-          style={styles.imageBg}
-        >
-          {backButton && (
-            <MaterialCommunityIcons
-              name="chevron-left"
-              color={Colors.white}
-              size={35}
-              style={{ left: 20, top: Platform.OS === "ios" ? -50 : -10 }}
-              onPress={() => navigation.goBack()}
-            />
-          )}
-          {overlay ? (
-            <View
-              style={[
-                styles.overlay,
-                { paddingTop: statusBarHeight, paddingBottom: 15 },
-              ]}
-            >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <View style={[styles.imageContainer, { height: HEADER_HEIGHT }]}>
+          <ImageBackground
+            src={
+              headerImageUrl && headerImageUrl !== null
+                ? headerImageUrl
+                : `https://res.cloudinary.com/dtu6cxvk6/image/upload/layer.png`
+            }
+            style={styles.imageBg}
+          >
+            {backButton && (
               <MaterialCommunityIcons
                 name="chevron-left"
                 color={Colors.white}
                 size={35}
-                style={styles.backButton}
+                style={{ left: 20, top: Platform.OS === "ios" ? -50 : -10 }}
                 onPress={() => navigation.goBack()}
               />
-              <StyledText
-                color={Colors.white}
-                type="heading"
-                variant="semibold"
-                style={{ textAlign: "center" }}
+            )}
+            {overlay ? (
+              <View
+                style={[
+                  styles.overlay,
+                  { paddingTop: statusBarHeight, paddingBottom: 15 },
+                ]}
               >
-                {headerText}
-              </StyledText>
-            </View>
-          ) : (
-            <View>
-              {headerText && (
-                <Image
-                  source={require("../../assets/images/logo_white.png")}
-                  style={{ alignSelf: "center", height: 60, width: 60 }}
+                <MaterialCommunityIcons
+                  name="chevron-left"
+                  color={Colors.white}
+                  size={35}
+                  style={styles.backButton}
+                  onPress={() => navigation.goBack()}
                 />
-              )}
-              <StyledText
-                color={Colors.white}
-                type="heading"
-                variant="semibold"
-                style={{ textAlign: "center", paddingBottom: 10 }}
-              >
-                {headerText}
-              </StyledText>
-            </View>
-          )}
-        </ImageBackground>
-      </View>
+                <StyledText
+                  color={Colors.white}
+                  type="heading"
+                  variant="semibold"
+                  style={{ textAlign: "center" }}
+                >
+                  {headerText}
+                </StyledText>
+              </View>
+            ) : (
+              <View>
+                {headerText && (
+                  <Image
+                    source={require("../../assets/images/logo_white.png")}
+                    style={{ alignSelf: "center", height: 60, width: 60 }}
+                  />
+                )}
+                <StyledText
+                  color={Colors.white}
+                  type="heading"
+                  variant="semibold"
+                  style={{ textAlign: "center", paddingBottom: 10 }}
+                >
+                  {headerText}
+                </StyledText>
+              </View>
+            )}
+          </ImageBackground>
+        </View>
 
-      {/* Scrollable content */}
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollViewContent}
-        refreshControl={
-          onRefresh ? (
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor={Colors.primary}
-            />
-          ) : null
-        }
-        showsVerticalScrollIndicator={false}
-      >
-        <KeyboardAvoidingView
-          // behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={{ flex: 1 }}
+        {/* Scrollable content */}
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollViewContent}
+          refreshControl={
+            onRefresh ? (
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                tintColor={Colors.primary}
+              />
+            ) : null
+          }
+          showsVerticalScrollIndicator={false}
         >
           {children}
-        </KeyboardAvoidingView>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </>
   );
 };
